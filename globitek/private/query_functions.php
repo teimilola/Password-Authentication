@@ -516,6 +516,18 @@
     } elseif (!is_unique_username($user['username'], $user['id'])) {
       $errors[] = "Username not allowed. Try another.";
     }
+
+    if(!is_blank($user['password'])){
+        if(!has_length($user['password'], array('min'=> 12, 'max'=>255))){
+          $errors[] = "Password must be between 12 and 255 characters";
+        }
+        if(!has_valid_password($user['password'])){
+          $errors[] = "Password is invalid";
+        }
+        if(strcmp($user['password'], $user['confirm_password']) !== 0){
+          $errors[] = "Passwords do not match";
+        }
+    }
     return $errors;
   }
 
@@ -559,6 +571,15 @@
     global $db;
 
     $errors = validate_user($user);
+
+    $prev_result = find_user_by_id($user['id']);
+    $prev_user = db_fetch_assoc($prev_result);
+    if(!is_blank($user['previous_password']) && !is_blank($user['password'])){
+        if(!password_verify($user['previous_password'], $prev_user['hashed_password'])){
+            $errors[] = "Previous password is incorrect";
+        }
+    }
+
     if (!empty($errors)) {
       return $errors;
     }
@@ -568,6 +589,9 @@
     $sql .= "last_name='" . db_escape($db, $user['last_name']) . "', ";
     $sql .= "email='" . db_escape($db, $user['email']) . "', ";
     $sql .= "username='" . db_escape($db, $user['username']) . "' ";
+    if(!empty($user['hashed_password'])){
+        $sql .= ", hashed_password='" . db_escape($db, $user['hashed_password']) . "'";
+    }
     $sql .= "WHERE id='" . db_escape($db, $user['id']) . "' ";
     $sql .= "LIMIT 1;";
     // For update_user statements, $result is just true/false

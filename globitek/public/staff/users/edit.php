@@ -29,70 +29,25 @@ if(is_post_request() && request_is_same_domain()) {
       $user['email'] = sanitize_input($_POST["email"]);
     }
     if(isset($_POST["password"])){
-      $password = sanitize_input($_POST["password"]);
+      $user['password'] = sanitize_input($_POST["password"]);
     }
     if(isset($_POST["confirm_password"])){
-      $confirm_password = sanitize_input($_POST["confirm_password"]);
+      $user['confirm_password'] = sanitize_input($_POST["confirm_password"]);
+    }
+    if(isset($_POST["previous_password"])){
+      $user['previous_password'] = sanitize_input($_POST["previous_password"]);
+    }
+    // Encryption/Hashing
+    if(!is_blank($user['password'])){
+      $user['hashed_password'] = password_hash($user['password'], PASSWORD_BCRYPT);
+    }
+    $result = update_user($user);
+    if($result === true) {
+      redirect_to('show.php?id=' . $user['id']);
+    } else {
+      $errors = $result;
     }
 
-    // Perform Validations
-    // Hint: Write these in private/validation_functions.php
-    if(is_blank($user['first_name'])){
-      $errors[] = "Firstname cannot be blank";
-    }
-    if(is_blank($user['last_name'])){
-      $errors[] = "Lastname cannot be blank";
-    }
-    if(is_blank($user['username'])){
-      $errors[] = "Username cannot be blank";
-    }
-    if(is_blank($user['email'])){
-      $errors[] = "email cannot be blank";
-    }
-    if(is_blank($password)){
-      $errors[] = "Password cannot be blank";
-    }
-
-    if(!has_valid_email_format($user['email'])){
-      $errors[] = "Invalid email";
-    }
-    if(!has_valid_username_format($user['username'])){
-      $errors[] = "Invalid Username";
-    }
-    if(!has_length($user['first_name'], array('min'=> 1, 'max'=>255))){
-      $errors[] = "Firstname must be less than 255 characters";
-    }
-    if(!has_length($user['last_name'], array('min'=> 1, 'max'=>255))){
-      $errors[] = "Lastname must be less than 255 characters";
-    }
-    if(!has_length($user['username'], array('min'=> 1, 'max'=>255))){
-      $errors[] = "Username must be less than 255 characters";
-    }
-    if(!has_length($user['email'], array('min'=> 1, 'max'=>255))){
-      $errors[] = "email must be less than 255 characters";
-    }
-    if(!has_length($password, array('min'=> 12, 'max'=>255))){
-      $errors[] = "Password must be between 12 and 255 characters";
-    }
-    if(!has_valid_password($password)){
-      $errors[] = "Password random is invalid";
-    }
-    if(strcmp($password, $confirm_password) !== 0){
-      $errors[] = "Passwords do not match";
-    }
-
-
-  // if there were no errors, submit data to database
-  if(empty($errors)){
-      // Encryption/Hashing
-      $user['hashed_password'] = password_hash($password, PASSWORD_BCRYPT);
-      $result = update_user($user);
-      if($result === true) {
-        redirect_to('show.php?id=' . $user['id']);
-      } else {
-        $errors = $result;
-      }
-  }
 }
 ?>
 <?php $page_title = 'Staff: Edit User ' . $user['first_name'] . " " . $user['last_name']; ?>
@@ -115,6 +70,15 @@ if(is_post_request() && request_is_same_domain()) {
     <input type="text" name="username" value="<?php echo h($user['username']); ?>" /><br />
     Email:<br />
     <input type="text" name="email" value="<?php echo h($user['email']); ?>" /><br />
+    <br/>Previous Password:<br />
+    <input type="password" name="previous_password"/><br />
+    <br />
+    Passwords should be at least 12 characters and include at least one uppercase letter, lowercase letter, number, and symbol.
+    <br/>Password:<br />
+    <input type="password" name="password"/><br />
+    <br />
+    Confirm Password:<br />
+    <input type="password" name="confirm_password"/><br />
     <br />
     <input type="submit" name="submit" value="Update"  />
   </form>
