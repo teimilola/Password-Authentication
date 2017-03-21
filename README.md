@@ -44,8 +44,8 @@ The following advanced user stories are optional:
   * [ ]  Identify the subtle Username Enumeration weakness. Include a short description of how the code could be modified to be more secure below:
 
 * Bonus Objective 2\.
-  * [ ]  User password validations only run when the password is not blank.
-  * [ ]  `update_user` only encrypts and updates the password when the password is not blank.
+  * [x]  User password validations only run when the password is not blank.
+  * [x]  `update_user` only encrypts and updates the password when the password is not blank.
 
 * Bonus Objective 3\.
   * [ ]  Create a new user using cost 10.
@@ -54,9 +54,9 @@ The following advanced user stories are optional:
   * [ ]  Briefly describe why login still works even after the cost is changed:
 
 * Bonus Objective 4\.
-  * [ ]  Add "Previous password" to "public/staff/users/edit.php"
-  * [ ]  Validate the previous password before allowing the password to be updated.
-  * [ ]  Require previous password only if new password is being updated (if also completing Bonus Objective 2).
+  * [x]  Add "Previous password" to "public/staff/users/edit.php"
+  * [x]  Validate the previous password before allowing the password to be updated.
+  * [x]  Require previous password only if new password is being updated (if also completing Bonus Objective 2).
 
 * Advanced Objective 1\.
   * [ ]  Implement `password_hash()` on your own as `my_password_hash()`.
